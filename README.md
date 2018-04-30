@@ -42,3 +42,15 @@ A dupla deve criar um repositório Git para hospedar seu trabalho. No entanto, a
     VirtualBox, virt-manager, KVM, etc
     Docker, LXC, etc
 
+----------------------------------------//----------------------------------------
+REFERENCIAS UTEIS:
+
+https://pt.wikipedia.org/wiki/Merge_sort#Implementa%C3%A7%C3%A3o_em_C++
+
+https://en.wikipedia.org/wiki/External_sorting
+
+http://wiki.icmc.usp.br/images/1/1e/SCC0203-1o-2012-15.OrdenacaoExterna.pdf
+
+https://www.youtube.com/watch?v=ATK74YSzwxg
+
+http://www.decom.ufop.br/guilherme/BCC203/geral/ed2_ordenacao-externa.pdf
