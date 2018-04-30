@@ -3,6 +3,7 @@
 TRABALHO 1 DA DISCIPLINA DE POD
 
 Denes Vargas Teixeira
+
 Natan Luiz Paetzhold Berwaldt
 
 Site da disciplina: http://www-usr.inf.ufsm.br/~jvlima/pod2018a/
@@ -43,6 +44,7 @@ A dupla deve criar um repositório Git para hospedar seu trabalho. No entanto, a
     Docker, LXC, etc
 
 ----------------------------------------//----------------------------------------
+
 REFERENCIAS UTEIS:
 
 https://pt.wikipedia.org/wiki/Merge_sort#Implementa%C3%A7%C3%A3o_em_C++
