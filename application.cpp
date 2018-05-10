@@ -6,6 +6,9 @@
 //
 */
 
+// Esta primeira versão está sendo feita ordenando Números, 
+// para entender bem o conceito da ordenação externa, pra depois trocar por palavras.
+
 #include<iostream>
 #include<fstream>
 #include<vector>
@@ -35,10 +38,11 @@ int main()
 
    int v[MemoriaRAM];
    int i = 0, j =0;;
+   //enquanto houver dados faça:
    while(fp >> v[i])
    {
         i++;
-        if(i==3)
+        if(i==MemoriaRAM)                       //quando i = memoria ram, faz o merge e poe no arquivo
         {
             MergeSort(v,MemoriaRAM);
             i=0;
@@ -54,14 +58,15 @@ int main()
 
 void grava(int vetor[],int nome_arq)
 {
-    fstream fout;
-    stringstream num;
-    string endereco;
+    fstream fout;       //string contendo o endereco do arquivo
+    stringstream num;   //string contendo o numero do arquivo
+    string endereco;    //string contendo o nome do arquivo
     int i = 0;
     endereco = "in";
     num << nome_arq;
     endereco = endereco+num.str();
     fout.open(endereco, fstream::in | fstream::out | fstream::app);
+   //passa os numeros do vetor para o arquivo
     while(i < MemoriaRAM)
     {
         fout << vetor[i]<<" ";
@@ -72,27 +77,29 @@ void grava(int vetor[],int nome_arq)
 
 void interpolacao()
 {
+   //Arquivos de entrada e de saida
     fstream in[NumeroArquivos/2];
     fstream out[NumeroArquivos/2];
 
 
-
+   //Abre os arquivos de entrada como in
     while(int i=0 < NumeroArquivos/2)
     {
         stringstream num = i;
-        string enderecoIn= "in"+num;
+        string enderecoIn= "in"+num.str();
         in[i].open(enderecoIn, fstream::in);
     }
-
+   
+   //Abre os arquivos de saida como out
     while(int i=0 < NumeroArquivos/2)
     {
         stringstream num = i;
-        string enderecoOut= "in"+num;
+        string enderecoOut= "out"+num.str();
         out[i].open(enderecoOut, fstream::out);
     }
 
     while(int i=0 < NumeroArquivos/2)
     {
-        s
+        //FAZER
     }
 }
