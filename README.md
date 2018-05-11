@@ -16,14 +16,14 @@ Site da disciplina: http://www-usr.inf.ufsm.br/~jvlima/pod2018a/
 
 Este trabalho consiste em implementar um algoritmo de ordenação externo basedo em Quicksort ou Merge sort. Assuma que o arquivo de entrada não cabe em memória, e o programa deve trabalhar com esta restrição.
 
-A entrada será um arquivo texto. Exemplos de entradas aqui.
+A entrada será um arquivo texto. Exemplos de entradas aqui: https://textfiles.com/etext/AUTHORS/
 
 O trabalho pode ser em duplas.
 
 
 - - Entrega
 
-Data de entrega: 15/05/2018
+Data de entrega: 16/05/2018
 
 O que deve ser entregue:
 
