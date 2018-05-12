@@ -78,7 +78,7 @@ int main()
     interpolacao(MemoriaRAM,result,1,maxCaminhos);
 
    //Comentar deletaTemps caso queira ver os arquivos
-   //deletaTemps();
+   deletaTemps();
    return 0;
 }
 
@@ -102,6 +102,7 @@ void grava(int vetor[],int nome_arq, int val){
   fw.close();
 }
 
+//Abre o arquivo que contem os dados ordenados e salva em saida.txt
 void encerra(int valor)
 {
    cout << "Salvando...." << endl;
@@ -175,7 +176,7 @@ void interpolacao(int tamParticao,int mRounds,int caminho, int maxCaminhos){
       cout << "Prints para nao precisar olhar os arquivos:" << endl;
       //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
       int cont[NumeroArquivos] = {};
-      for(int c = 0; c < NumeroArquivos*MemoriaRAM*caminho;c++){
+      for(int c = 0; c <= NumeroArquivos*MemoriaRAM*caminho;c++){
         if(count_toC != 0){
             c+= count_toC;
             count_toC = 0;
@@ -186,7 +187,6 @@ void interpolacao(int tamParticao,int mRounds,int caminho, int maxCaminhos){
         cout << "Menor ta no indice:" << ind << endl;
         // coloca no vetor de saida o menor valor dos n arquivos
         out[part] <<  " " << vinicial[ind];
-        cout << "///Aquivalor:"<<in[ind].peek();
         //flags para quando o arquivo tem menos arquivos do que a memoriaRam, para nao gerar bugs
         if((in[ind].peek() == -1)){
           //caso nao tenha mais numeros no arquivo ele ve se ele ocupou toda a memoriaRam daquela particao do arquivo
@@ -215,11 +215,12 @@ void interpolacao(int tamParticao,int mRounds,int caminho, int maxCaminhos){
     }
 
 
-  //Chama novamente a interpolacao para o proximo caminho
+  //Chama novamente a interpolacao para o proximo caminho, aumentando o tamanho da particao, reduzindo o numero de particoes(result) e incrementando o caminho
    if(caminho < maxCaminhos){
         int result = (int)(mRounds/NumeroArquivos) + (mRounds % NumeroArquivos > 0 ? 1 : 0);
         interpolacao(tamParticao*NumeroArquivos ,result, caminho+1, maxCaminhos);
    }
+   
   //Ou encerra e salva os dados no arquivos de saida.txt
    else{
       if(caminho % 2 == 0)
