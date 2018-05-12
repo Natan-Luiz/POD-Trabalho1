@@ -15,7 +15,7 @@
 #include<string>
 #include<sstream>
 
-#define NumeroArquivos 5
+#define NumeroArquivos 5 // 5 arquivos temp e 5 out
 #define MemoriaRAM     5 // vai mudar para 1 MB de memoria
 
 #define ENTRADA "entrada.txt"
@@ -27,6 +27,7 @@ void Juntar(int vetor[], int ini, int meio, int fim, int vetAux[]);
 int quicksort(int *a, int inicio, int fim);
 int particiona(int *a, int inicio, int fim);
 void interpolacao();
+void deletaTemps();
 
 int main()
 {
@@ -35,14 +36,10 @@ int main()
    fp.open(ENTRADA);
    if(fp.is_open() == false)
         std::cout << "Nao foi possivel abrir arquivo entrada" << std::endl;
-   cout << "asdfsadfsdf" << endl;
    int v[MemoriaRAM];
    int i = 0, j = 0;
    //enquanto houver dados faça:
-   while(fp >> v[i])
-   {
-        //fp >> v[i];
-        cout << "ta no while" << v[i] << endl;
+   while(fp >> v[i]){
         i++;
         if(i==MemoriaRAM)                       //quando i = memoria ram, faz o quick e poe nos buffers temporários
         {
@@ -61,6 +58,10 @@ int main()
      j++;
    }
    interpolacao();
+   //vai ir aqui a função que coloca em um unico arquivo de saída o conteúdo dos arquivos 'out'
+
+   //Comentar deletaTemps caso queira ver os arquivos
+   deletaTemps();
    return 0;
 }
 
@@ -90,6 +91,7 @@ void interpolacao(){
   fstream out[NumeroArquivos];
   //Abre os arquivos de entrada como in
   int i = 0;
+  //while que coloca todos os arquivos 'temp' no vetor de arquivos 'in[i]'
   while(i < NumeroArquivos){
     stringstream num;
     num << i;
@@ -100,7 +102,7 @@ void interpolacao(){
     i++;
   }
   int j = 0;
-  //Abre os arquivos de saida como out
+  //Abre os arquivos de saida no vetor de arquivos out[n] onde vao ser colocados a interpolação dos arquivos temp
   while(j < NumeroArquivos){
     stringstream num;
     num << j;
@@ -110,6 +112,30 @@ void interpolacao(){
     out[j].open(nome, fstream::out);
     j++;
   }
+  //a partir daqui esta em implementação
+  //A ideia era armazenar no vetor 'v1' os primeiros valores de cada conjunto de MemoriaRam,
+  //Em que cada indice desse vetor representa o numero do arquivo temp
+  //E o conteúdo desse indice é o menor valor de tal arquivo
+  //Para depois pegar o menor valor do vetor e escrever ele no arquivo out
+  //Quando pega o menor valor do vetor 'v1' coloca-se outro do arquivo temp daquele indice até o final da palavra
+  int vinicial[MemoriaRAM];
+  //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
+  for(int c = 0; c < NumeroArquivos; c++){
+    in[c] >> vinicial[c];
+  }
+  //falta o resto descrito ali em cima
+  //colocar nos respectivos arquivos OUTs (como se fosse os arquivos D, E e F do video http://www.showme.com/sh/?h=0a0OGGW)
+  //para depois de sair dessa função juntar todos os OUTs para o arquivo de saída
+
+  //aqui fecha os arquivos abertos nessa função
+  for(int k = 0; k < NumeroArquivos; k++){
+    in[k].close();
+    out[k].close();
+  }
+}
+
+//Deleta os arquivos temporarios
+void deletaTemps(){
   for(int k = 0; k < NumeroArquivos; k++){
     stringstream num;
     num << k;
@@ -118,25 +144,26 @@ void interpolacao(){
     arqtemp += ".txt";
     const char *nome = arqtemp.c_str();
     const char *nomesaida = arqout.c_str();
-    in[k].close();
-    out[k].close();
+    //deleta os buffers temporarios("tempN")
     remove(nome);
+    //deleta os arquivos de interpolação("outN")
     remove(nomesaida);
   }
 }
 
 //Ordenação dos buffers temporarios é feita com quicksort
 int quicksort(int *a, int inicio, int fim){
-    int index;
-    if(inicio >= fim)
-        return 0;
-    {
-        index = particiona(a, inicio, fim);
-        quicksort(a, inicio, index-1);
-        quicksort(a, index+1, fim);
-    }
+  int index;
+  if(inicio >= fim)
+    return 0;
+  {
+    index = particiona(a, inicio, fim);
+    quicksort(a, inicio, index-1);
+    quicksort(a, index+1, fim);
+  }
 }
 
+//Subfunção do quicksort interno
 int particiona(int *a, int inicio, int fim){
     int i,j,pindex,pivo;
     pindex = inicio;
