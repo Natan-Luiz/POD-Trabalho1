@@ -16,8 +16,8 @@
 #include<sstream>
 #include<math.h>
 
-#define NumeroArquivos 3 // 5 arquivos temp e 5 out
-#define MemoriaRAM     3 // vai mudar para 1 MB de memoria
+#define NumeroArquivos 5 // 5 arquivos temp e 5 out
+#define MemoriaRAM     5 // vai mudar para 1 MB de memoria
 
 #define ENTRADA "entrada.txt"
 #define SAIDA "saida.txt"
@@ -102,7 +102,6 @@ void grava(int vetor[],int nome_arq, int val){
   fw.close();
 }
 
-//Abre o arquivo que contem os dados ordenados e salva em saida.txt
 void encerra(int valor)
 {
    cout << "Salvando...." << endl;
@@ -176,7 +175,7 @@ void interpolacao(int tamParticao,int mRounds,int caminho, int maxCaminhos){
       cout << "Prints para nao precisar olhar os arquivos:" << endl;
       //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
       int cont[NumeroArquivos] = {};
-      for(int c = 0; c <= NumeroArquivos*MemoriaRAM*caminho;c++){
+      for(int c = 0; c <= NumeroArquivos*tamParticao;c++){
         if(count_toC != 0){
             c+= count_toC;
             count_toC = 0;
@@ -215,12 +214,11 @@ void interpolacao(int tamParticao,int mRounds,int caminho, int maxCaminhos){
     }
 
 
-  //Chama novamente a interpolacao para o proximo caminho, aumentando o tamanho da particao, reduzindo o numero de particoes(result) e incrementando o caminho
+  //Chama novamente a interpolacao para o proximo caminho
    if(caminho < maxCaminhos){
         int result = (int)(mRounds/NumeroArquivos) + (mRounds % NumeroArquivos > 0 ? 1 : 0);
         interpolacao(tamParticao*NumeroArquivos ,result, caminho+1, maxCaminhos);
    }
-   
   //Ou encerra e salva os dados no arquivos de saida.txt
    else{
       if(caminho % 2 == 0)
