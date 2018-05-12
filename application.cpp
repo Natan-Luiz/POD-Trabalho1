@@ -58,8 +58,8 @@ int main()
      j++;
    }
    interpolacao();
-   //vai ir aqui a função que coloca em um unico arquivo de saída o conteúdo dos arquivos 'out'
-
+   //Depois que interpolação funcionar coloca-la em recursão até sobrar um arquivo de saída
+   
    //Comentar deletaTemps caso queira ver os arquivos
    deletaTemps();
    return 0;
@@ -113,11 +113,11 @@ void interpolacao(){
     j++;
   }
   //a partir daqui esta em implementação
-  //A ideia era armazenar no vetor 'v1' os primeiros valores de cada conjunto de MemoriaRam,
+  //A ideia era armazenar no vetor 'vinicial' os primeiros valores de cada conjunto de MemoriaRam,
   //Em que cada indice desse vetor representa o numero do arquivo temp
   //E o conteúdo desse indice é o menor valor de tal arquivo
   //Para depois pegar o menor valor do vetor e escrever ele no arquivo out
-  //Quando pega o menor valor do vetor 'v1' coloca-se outro do arquivo temp daquele indice até o final da palavra
+  //Quando pega o menor valor do vetor 'vinicial' coloca-se outro do arquivo temp daquele indice até o final da palavra
   int vinicial[MemoriaRAM];
   //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
   for(int c = 0; c < NumeroArquivos; c++){
