@@ -14,6 +14,7 @@
 #include<vector>
 #include<string>
 #include<sstream>
+#include<math.h>
 
 #define NumeroArquivos 3 // 5 arquivos temp e 5 out
 #define MemoriaRAM     3 // vai mudar para 1 MB de memoria
@@ -27,7 +28,7 @@ void grava(int vetor[],int nome_arq,int val);
 void Juntar(int vetor[], int ini, int meio, int fim, int vetAux[]);
 int quicksort(int *a, int inicio, int fim);
 int particiona(int *a, int inicio, int fim);
-void interpolacao(int mRounds, int caminho, int maxCaminhos);
+void interpolacao(int tamParticao,int mRounds, int caminho, int maxCaminhos);
 void deletaTemps();
 int procura_menor(int *vet, int n);
 void encerra(fstream final[]);
@@ -73,7 +74,8 @@ int main()
        result = (int)(result/NumeroArquivos) + (result % NumeroArquivos > 0 ? 1 : 0);
        maxCaminhos++;
     }
-    interpolacao(particoes,1,maxCaminhos);
+    result = (int)(particoes/NumeroArquivos) + (particoes % NumeroArquivos > 0 ? 1 : 0);
+    interpolacao(MemoriaRAM,result,1,maxCaminhos);
 
    //Comentar deletaTemps caso queira ver os arquivos
    //deletaTemps();
@@ -94,24 +96,31 @@ void grava(int vetor[],int nome_arq, int val){
   //cria o arquivo temp
   fw.open(nome, fstream::in | fstream::out | fstream::app);
   while(i < val){
-    fw << vetor[i] << " ";
+    fw << " " << vetor[i];
     i++;
   }
   fw.close();
 }
 
-void encerra(fstream final[])
+void encerra(int valor)
 {
    cout << "Salvando...." << endl;
-   fstream fp;
-   fp.open(SAIDA, fstream::out);
+   fstream fpout, fpin;
+   fpout.open(SAIDA, fstream::out);
+
+   if(valor == 1)
+      fpin.open("temp0.txt",fstream::in);
+   else
+      fpin.open("out0.txt",fstream::in);
+
    int temp;
-   while(final[0] >> temp)
-      fp << temp;
-   fp.close();
+   while(fpin >> temp)
+      fpout << temp << " ";
+   fpout.close();
 }
 
-void interpolacao(int mRounds,int caminho, int maxCaminhos){
+
+void interpolacao(int tamParticao,int mRounds,int caminho, int maxCaminhos){
   //Arquivos de entrada e de saida
   fstream in[NumeroArquivos];
   fstream out[NumeroArquivos];
@@ -146,7 +155,7 @@ void interpolacao(int mRounds,int caminho, int maxCaminhos){
 
     int round = 1, part = 0;
   //Chama novamente a interpolacao para a 'proxima rodada'/'proximo caminho'
-    while (round < mRounds){
+    while (round <= mRounds){
       //a partir daqui esta em implementação
       //A ideia era armazenar no vetor 'v1' os primeiros valores de cada conjunto de MemoriaRam,
       //Em que cada indice desse vetor representa o numero do arquivo temp
@@ -154,41 +163,44 @@ void interpolacao(int mRounds,int caminho, int maxCaminhos){
       //Para depois pegar o menor valor do vetor e escrever ele no arquivo out
       //Quando pega o menor valor do vetor 'v1' coloca-se outro do arquivo temp daquele indice até o final da palavra
       int vinicial[MemoriaRAM];
+      int count_toC = 0;
       //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
       for(int c = 0; c < NumeroArquivos; c++){
-        in[c] >> vinicial[c];
+        if(in[c] >> vinicial[c]);
+        else{
+            vinicial[c] = -1;
+            count_toC+=NumeroArquivos*caminho;
+        }
       }
       cout << "Prints para nao precisar olhar os arquivos:" << endl;
       //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
       int cont[NumeroArquivos] = {};
       for(int c = 0; c < NumeroArquivos*MemoriaRAM*caminho;c++){
+        if(count_toC != 0){
+            c+= count_toC;
+            count_toC = 0;
+        }
         //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
         int ind = procura_menor(vinicial, NumeroArquivos);
+        if(vinicial[ind] == -1) break;
         cout << "Menor ta no indice:" << ind << endl;
         // coloca no vetor de saida o menor valor dos n arquivos
-        out[part] << vinicial[ind] << " ";
+        out[part] <<  " " << vinicial[ind];
+        cout << "///Aquivalor:"<<in[ind].peek();
         //flags para quando o arquivo tem menos arquivos do que a memoriaRam, para nao gerar bugs
-        
-         
-         ///////////////////
-         //ERRO: fazendo essa atribuição abaixo tu acaba pegando um valor do arquivo e não utilizando, caso esteja no final da execução tu até descarta ele, 
-         // assim esse valor acaba faltando na execução seguinte.
-         ///////////////////
-         
-         
-         if(!(in[ind] >> vinicial[ind])){
+        if((in[ind].peek() == -1)){
           //caso nao tenha mais numeros no arquivo ele ve se ele ocupou toda a memoriaRam daquela particao do arquivo
           //no caso de ter espaços vazios, ele desconta esses espaços do 'c' para executar um numero menor de vezes
-          vinicial[ind] = -1;
           int dif = (MemoriaRAM - (cont[ind]+1));
           c += dif;
-           
         }
         //incrementa o numero de entradas lidas em um arquivo
         cont[ind] += 1;
         //coloca flag quando ja leu toda a partição de um arquivo, ou seja todos as entradas de algum arquivo ja estão escritos na saida
-        if(cont[ind] % MemoriaRAM == 0)
+        if(cont[ind] % tamParticao == 0 || in[ind].peek() == -1)
           vinicial[ind] = -1;
+        else
+          in[ind] >> vinicial[ind];
       }
       part++;
       //caso a particao seja o numero de arquivos, ela vira a particao zero e voltamos a analisar o primeiro arquivo
@@ -197,20 +209,23 @@ void interpolacao(int mRounds,int caminho, int maxCaminhos){
    }
 
     //aqui fecha os arquivos abertos nessa função
-  for(int k = 0; k < NumeroArquivos; k++){
-    in[k].close();
-    out[k].close();
-  }
+    for(int k = 0; k < NumeroArquivos; k++){
+        in[k].close();
+        out[k].close();
+    }
+
 
   //Chama novamente a interpolacao para o proximo caminho
-   if(caminho < maxCaminhos)
-      interpolacao(mRounds,caminho+1, maxCaminhos);
+   if(caminho < maxCaminhos){
+        int result = (int)(mRounds/NumeroArquivos) + (mRounds % NumeroArquivos > 0 ? 1 : 0);
+        interpolacao(tamParticao*NumeroArquivos ,result, caminho+1, maxCaminhos);
+   }
   //Ou encerra e salva os dados no arquivos de saida.txt
    else{
       if(caminho % 2 == 0)
-         encerra(out);
+         encerra(1);
       else
-         encerra(in);
+         encerra(0);
     }
 
 
