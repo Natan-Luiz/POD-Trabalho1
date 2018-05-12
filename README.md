@@ -56,3 +56,5 @@ http://wiki.icmc.usp.br/images/1/1e/SCC0203-1o-2012-15.OrdenacaoExterna.pdf
 https://www.youtube.com/watch?v=ATK74YSzwxg
 
 http://www.decom.ufop.br/guilherme/BCC203/geral/ed2_ordenacao-externa.pdf
+
+http://www.showme.com/sh/?h=0a0OGGW
