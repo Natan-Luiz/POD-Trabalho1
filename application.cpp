@@ -15,10 +15,11 @@
 #include<string>
 #include<sstream>
 
-#define NumeroArquivos 5 // 5 arquivos temp e 5 out
-#define MemoriaRAM     5 // vai mudar para 1 MB de memoria
+#define NumeroArquivos 3 // 5 arquivos temp e 5 out
+#define MemoriaRAM     3 // vai mudar para 1 MB de memoria
 
 #define ENTRADA "entrada.txt"
+#define SAIDA "saida.txt"
 
 using namespace std;
 
@@ -26,9 +27,10 @@ void grava(int vetor[],int nome_arq,int val);
 void Juntar(int vetor[], int ini, int meio, int fim, int vetAux[]);
 int quicksort(int *a, int inicio, int fim);
 int particiona(int *a, int inicio, int fim);
-void interpolacao();
+void interpolacao(int mRounds, int caminho, int maxCaminhos);
 void deletaTemps();
 int procura_menor(int *vet, int n);
+void encerra(fstream final[]);
 
 int main()
 {
@@ -38,7 +40,7 @@ int main()
    if(fp.is_open() == false)
         std::cout << "Nao foi possivel abrir arquivo entrada" << std::endl;
    int v[MemoriaRAM];
-   int i = 0, j = 0;
+   int i = 0, j = 0, particoes = 0;
    //enquanto houver dados faça:
    while(fp >> v[i]){
         i++;
@@ -49,19 +51,32 @@ int main()
             if(j % NumeroArquivos == 0) j=0;
             grava(v,j,MemoriaRAM);
             j++;
+            particoes++;
         }
    }
-   //erro do que sobra do vetor --> corrigir
+
    if(i > 0){
      quicksort(v, 0, i-1);
      if(j % NumeroArquivos == 0) j=0;
        grava(v,j,i);
      j++;
+     particoes++;
    }
-   interpolacao();
+
+   cout << "Ordenando...." << endl;
+
+
+    // O numero maximo de caminhos é dado pelo numero de vezes que se pode dividir o numero
+    // de particoes pelo numero de arquivos.
+    int maxCaminhos=0, result=particoes;
+    while(result>1){
+       result = (int)(result/NumeroArquivos) + (result % NumeroArquivos > 0 ? 1 : 0);
+       maxCaminhos++;
+    }
+    interpolacao(particoes,1,maxCaminhos);
 
    //Comentar deletaTemps caso queira ver os arquivos
-   deletaTemps();
+   //deletaTemps();
    return 0;
 }
 
@@ -85,73 +100,122 @@ void grava(int vetor[],int nome_arq, int val){
   fw.close();
 }
 
-void interpolacao(){
+void encerra(fstream final[])
+{
+   cout << "Salvando...." << endl;
+   fstream fp;
+   fp.open(SAIDA, fstream::out);
+   int temp;
+   while(final[0] >> temp)
+      fp << temp;
+   fp.close();
+}
+
+void interpolacao(int mRounds,int caminho, int maxCaminhos){
   //Arquivos de entrada e de saida
   fstream in[NumeroArquivos];
   fstream out[NumeroArquivos];
   //Abre os arquivos de entrada como in
   int i = 0;
-  //while que coloca todos os arquivos 'temp' no vetor de arquivos 'in[i]'
+  //while que coloca todos os arquivos 'temp' no vetor de arquivos 'in[i]' e 'out' no 'out[i]'
   while(i < NumeroArquivos){
     stringstream num;
     num << i;
+    //Da o nome tempoN.txt
     string enderecoIn = "temp"+num.str();
     enderecoIn += ".txt";
-    const char *nome = enderecoIn.c_str();
-    in[i].open(nome, fstream::in);
-    i++;
-  }
-  int j = 0;
-  //Abre os arquivos de saida no vetor de arquivos out[n] onde vao ser colocados a interpolação dos arquivos temp
-  while(j < NumeroArquivos){
-    stringstream num;
-    num << j;
+    const char *nomeI = enderecoIn.c_str();
+
+    //Da o nome outN.txt
     string enderecoOut= "out"+num.str();
     enderecoOut += ".txt";
-    const char *nome = enderecoOut.c_str();
-    out[j].open(nome, fstream::out);
-    j++;
-  }
-  //a partir daqui esta em implementação
-  //A ideia era armazenar no vetor 'v1' os primeiros valores de cada conjunto de MemoriaRam,
-  //Em que cada indice desse vetor representa o numero do arquivo temp
-  //E o conteúdo desse indice é o menor valor de tal arquivo
-  //Para depois pegar o menor valor do vetor e escrever ele no arquivo out
-  //Quando pega o menor valor do vetor 'v1' coloca-se outro do arquivo temp daquele indice até o final da palavra
-  int vinicial[MemoriaRAM];
-  //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
-  for(int c = 0; c < NumeroArquivos; c++){
-    in[c] >> vinicial[c];
-  }
-  cout << "Prints para nao precisar olhar os arquivos:" << endl;
-  //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
-  int cont[NumeroArquivos] = {};
-  for(int c = 0; c < NumeroArquivos*MemoriaRAM;c++){
-    //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
-    int ind = procura_menor(vinicial, NumeroArquivos);
-    cout << "Menor ta no indice:" << ind << endl;
-    // coloca no vetor de saida o menor valor dos n arquivos
-    out[0] << vinicial[ind] << " ";
-    //flags para quando o arquivo tem menos arquivos do que a memoriaRam, para nao gerar bugs
-    if(!(in[ind] >> vinicial[ind])){
-      //caso nao tenha mais numeros no arquivo ele ve se ele ocupou toda a memoriaRam daquela particao do arquivo
-      //no caso de ter espaços vazios, ele desconta esses espaços do 'c' para executar um numero menor de vezes
-      vinicial[ind] = -1;
-      int dif = (MemoriaRAM - (cont[ind]+1));
-      c += dif;
+    const char *nomeO = enderecoOut.c_str();
+
+    //Atribui out.txt ou temp.txt para 'in' ou 'out' de acordo com a rodada atual
+    if(caminho%2==0){
+        in[i].open(nomeO, fstream::in);
+        out[i].open(nomeI, fstream::out);
     }
-    //incrementa o numero de entradas lidas em um arquivo
-    cont[ind] += 1;
-    //coloca flag quando ja leu toda a partição de um arquivo, ou seja todos as entradas de algum arquivo ja estão escritos na saida
-    if(cont[ind] % MemoriaRAM == 0)
-      vinicial[ind] = -1;
+    else{
+        in[i].open(nomeI, fstream::in);
+        out[i].open(nomeO, fstream::out);
+    }
+    //incrementa o indice
+    i++;
   }
-  //aqui fecha os arquivos abertos nessa função
+
+    int round = 1, part = 0;
+  //Chama novamente a interpolacao para a 'proxima rodada'/'proximo caminho'
+    while (round < mRounds){
+      //a partir daqui esta em implementação
+      //A ideia era armazenar no vetor 'v1' os primeiros valores de cada conjunto de MemoriaRam,
+      //Em que cada indice desse vetor representa o numero do arquivo temp
+      //E o conteúdo desse indice é o menor valor de tal arquivo
+      //Para depois pegar o menor valor do vetor e escrever ele no arquivo out
+      //Quando pega o menor valor do vetor 'v1' coloca-se outro do arquivo temp daquele indice até o final da palavra
+      int vinicial[MemoriaRAM];
+      //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
+      for(int c = 0; c < NumeroArquivos; c++){
+        in[c] >> vinicial[c];
+      }
+      cout << "Prints para nao precisar olhar os arquivos:" << endl;
+      //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
+      int cont[NumeroArquivos] = {};
+      for(int c = 0; c < NumeroArquivos*MemoriaRAM*caminho;c++){
+        //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
+        int ind = procura_menor(vinicial, NumeroArquivos);
+        cout << "Menor ta no indice:" << ind << endl;
+        // coloca no vetor de saida o menor valor dos n arquivos
+        out[part] << vinicial[ind] << " ";
+        //flags para quando o arquivo tem menos arquivos do que a memoriaRam, para nao gerar bugs
+        
+         
+         ///////////////////
+         //ERRO: fazendo essa atribuição abaixo tu acaba pegando um valor do arquivo e não utilizando, caso esteja no final da execução tu até descarta ele, 
+         // assim esse valor acaba faltando na execução seguinte.
+         ///////////////////
+         
+         
+         if(!(in[ind] >> vinicial[ind])){
+          //caso nao tenha mais numeros no arquivo ele ve se ele ocupou toda a memoriaRam daquela particao do arquivo
+          //no caso de ter espaços vazios, ele desconta esses espaços do 'c' para executar um numero menor de vezes
+          vinicial[ind] = -1;
+          int dif = (MemoriaRAM - (cont[ind]+1));
+          c += dif;
+           
+        }
+        //incrementa o numero de entradas lidas em um arquivo
+        cont[ind] += 1;
+        //coloca flag quando ja leu toda a partição de um arquivo, ou seja todos as entradas de algum arquivo ja estão escritos na saida
+        if(cont[ind] % MemoriaRAM == 0)
+          vinicial[ind] = -1;
+      }
+      part++;
+      //caso a particao seja o numero de arquivos, ela vira a particao zero e voltamos a analisar o primeiro arquivo
+      if(part == NumeroArquivos) part = 0;
+      round++;
+   }
+
+    //aqui fecha os arquivos abertos nessa função
   for(int k = 0; k < NumeroArquivos; k++){
     in[k].close();
     out[k].close();
   }
+
+  //Chama novamente a interpolacao para o proximo caminho
+   if(caminho < maxCaminhos)
+      interpolacao(mRounds,caminho+1, maxCaminhos);
+  //Ou encerra e salva os dados no arquivos de saida.txt
+   else{
+      if(caminho % 2 == 0)
+         encerra(out);
+      else
+         encerra(in);
+    }
+
+
 }
+
 
 int procura_menor(int *vet, int n){
   int menor;
@@ -201,7 +265,7 @@ int quicksort(int *a, int inicio, int fim){
 
 //Subfunção do quicksort interno
 int particiona(int *a, int inicio, int fim){
-  int i,j,pindex,pivo;
+  int i,pindex,pivo;
   pindex = inicio;
   pivo = a[fim];
   for(i = inicio; i < fim;i++)
