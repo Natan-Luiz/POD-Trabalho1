@@ -28,10 +28,11 @@ int quicksort(int *a, int inicio, int fim);
 int particiona(int *a, int inicio, int fim);
 void interpolacao();
 void deletaTemps();
+int procura_menor(int *vet, int n);
 
 int main()
 {
-   cout<<"Carregando...."<<endl;
+   cout << "Carregando...." << endl;
    fstream fp;
    fp.open(ENTRADA);
    if(fp.is_open() == false)
@@ -58,8 +59,7 @@ int main()
      j++;
    }
    interpolacao();
-   //Depois que interpolação funcionar coloca-la em recursão até sobrar um arquivo de saída
-   
+
    //Comentar deletaTemps caso queira ver os arquivos
    deletaTemps();
    return 0;
@@ -79,7 +79,7 @@ void grava(int vetor[],int nome_arq, int val){
   //cria o arquivo temp
   fw.open(nome, fstream::in | fstream::out | fstream::app);
   while(i < val){
-    fw << vetor[i]<<" ";
+    fw << vetor[i] << " ";
     i++;
   }
   fw.close();
@@ -113,25 +113,61 @@ void interpolacao(){
     j++;
   }
   //a partir daqui esta em implementação
-  //A ideia era armazenar no vetor 'vinicial' os primeiros valores de cada conjunto de MemoriaRam,
+  //A ideia era armazenar no vetor 'v1' os primeiros valores de cada conjunto de MemoriaRam,
   //Em que cada indice desse vetor representa o numero do arquivo temp
   //E o conteúdo desse indice é o menor valor de tal arquivo
   //Para depois pegar o menor valor do vetor e escrever ele no arquivo out
-  //Quando pega o menor valor do vetor 'vinicial' coloca-se outro do arquivo temp daquele indice até o final da palavra
+  //Quando pega o menor valor do vetor 'v1' coloca-se outro do arquivo temp daquele indice até o final da palavra
   int vinicial[MemoriaRAM];
   //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
   for(int c = 0; c < NumeroArquivos; c++){
     in[c] >> vinicial[c];
   }
-  //falta o resto descrito ali em cima
-  //colocar nos respectivos arquivos OUTs (como se fosse os arquivos D, E e F do video http://www.showme.com/sh/?h=0a0OGGW)
-  //para depois de sair dessa função juntar todos os OUTs para o arquivo de saída
-
+  cout << "Prints para nao precisar olhar os arquivos:" << endl;
+  //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
+  int cont[NumeroArquivos] = {};
+  for(int c = 0; c < NumeroArquivos*MemoriaRAM;c++){
+    //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
+    int ind = procura_menor(vinicial, NumeroArquivos);
+    cout << "Menor ta no indice:" << ind << endl;
+    // coloca no vetor de saida o menor valor dos n arquivos
+    out[0] << vinicial[ind] << " ";
+    //flags para quando o arquivo tem menos arquivos do que a memoriaRam, para nao gerar bugs
+    if(!(in[ind] >> vinicial[ind])){
+      //caso nao tenha mais numeros no arquivo ele ve se ele ocupou toda a memoriaRam daquela particao do arquivo
+      //no caso de ter espaços vazios, ele desconta esses espaços do 'c' para executar um numero menor de vezes
+      vinicial[ind] = -1;
+      int dif = (MemoriaRAM - (cont[ind]+1));
+      c += dif;
+    }
+    //incrementa o numero de entradas lidas em um arquivo
+    cont[ind] += 1;
+    //coloca flag quando ja leu toda a partição de um arquivo, ou seja todos as entradas de algum arquivo ja estão escritos na saida
+    if(cont[ind] % MemoriaRAM == 0)
+      vinicial[ind] = -1;
+  }
   //aqui fecha os arquivos abertos nessa função
   for(int k = 0; k < NumeroArquivos; k++){
     in[k].close();
     out[k].close();
   }
+}
+
+int procura_menor(int *vet, int n){
+  int menor;
+  int i = 1, ind = 0;
+  cout << "-" << vet[0] << "-";
+  if(vet[0] >= 0)
+    menor = vet[0];
+  while(i < n){
+    if(menor > vet[i] && vet[i] >= 0){
+      menor = vet[i];
+      ind = i;
+    }
+    cout << "-" << vet[i] << "-";
+    i++;
+  }
+  return ind;
 }
 
 //Deleta os arquivos temporarios
@@ -165,17 +201,17 @@ int quicksort(int *a, int inicio, int fim){
 
 //Subfunção do quicksort interno
 int particiona(int *a, int inicio, int fim){
-    int i,j,pindex,pivo;
-    pindex = inicio;
-    pivo = a[fim];
-    for(i = inicio; i < fim;i++)
+  int i,j,pindex,pivo;
+  pindex = inicio;
+  pivo = a[fim];
+  for(i = inicio; i < fim;i++)
+  {
+    if(a[i] <= pivo)
     {
-        if(a[i] <= pivo)
-        {
-            swap(a[pindex], a[i]);
-            pindex++;
-        }
+      swap(a[pindex], a[i]);
+      pindex++;
     }
-    swap(a[pindex], a[fim]);
-    return pindex;
+  }
+  swap(a[pindex], a[fim]);
+  return pindex;
 }
