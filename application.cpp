@@ -161,7 +161,6 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
         count_toC += tamParticao;
       }
     }
-    cout << endl;
     //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
     int cont[NumeroArquivos] = {};
     for(int c = 0; c <= NumeroArquivos*tamParticao; c++){
