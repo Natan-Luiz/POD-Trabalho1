@@ -17,7 +17,7 @@
 #include<math.h>
 
 #define NumeroArquivos 5 // 5 arquivos temp e 5 out
-#define MemoriaRAM     125 // vai mudar para 1 MB de memoria
+#define MemoriaRAM     25 // vai mudar para 1 MB de memoria
 
 #define ENTRADA "entrada.txt"
 #define SAIDA "saida.txt"
@@ -120,7 +120,8 @@ void encerra(int valor){
 
   string temp;
   while(fpin >> temp)
-    fpout << temp << " ";
+    if(temp.compare("~")!=0)
+      fpout << temp << " ";
   fpout.close();
 }
 
@@ -164,19 +165,24 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
     string vinicial[NumeroArquivos];
     //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
     for(int c = 0; c < NumeroArquivos; c++){
-      if(in[c] >> vinicial[c]);
+      if(in[c] >> vinicial[c])
+      {
+        if (vinicial[c].compare("~") == 0)
+	   vinicial[c] = "&";
+      }
       else{
         vinicial[c] = "&";
       }
     }
-    //vetor que conta quantos elementos foram lidos de cada arquivo durante as comparacoes -> usado na correção de bugs
-    int cont[NumeroArquivos] = {};
     while(true){
 
       //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
       int ind = procura_menor(vinicial, NumeroArquivos);
       cout << "Menor ta no arquivo:" << ind << endl;
-      if(vinicial[ind].compare("&") == 0) break;
+      if(vinicial[ind].compare("&") == 0){
+		out[part] << " ~ ";
+	break;
+      }
       // coloca no vetor de saida o menor valor dos n arquivos
       out[part] <<  " " << vinicial[ind];
 
@@ -185,10 +191,12 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
         vinicial[ind] = "&";
       else{
         in[ind] >> vinicial[ind];
-        if(vinicial[ind].compare("~")==0)
+        if(vinicial[ind].compare("~") == 0)
            vinicial[ind] = "&";
       }
     }
+    part++;
+    if(part == NumeroArquivos) part = 0;
     round++;
   }
   //aqui fecha os arquivos abertos nessa função
