@@ -6,8 +6,6 @@
 //
 */
 
-// Esta primeira versão está sendo feita ordenando Números,
-// para entender bem o conceito da ordenação externa, pra depois trocar por palavras.
 
 #include<iostream>
 #include<fstream>
@@ -16,8 +14,8 @@
 #include<sstream>
 #include<math.h>
 
-#define NumeroArquivos 5 // 5 arquivos temp e 5 out
-#define MemoriaRAM     25 // vai mudar para 1 MB de memoria
+#define NumeroArquivos 10 // 10 arquivos temp e 10 out.
+#define MemoriaRAM     200 // Tamanho da memoria disponivel para ordenação, em Bytes.
 
 #define ENTRADA "entrada.txt"
 #define SAIDA "saida.txt"
@@ -81,9 +79,9 @@ int main()
   interpolacao(MemoriaRAM, result, 1, maxCaminhos);
 
   //Comentar deletaTemps caso queira ver os arquivos
-  //deletaTemps();
+  deletaTemps();
   return 0;
-}
+  }
 
 
 
@@ -178,7 +176,7 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
 
       //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
       int ind = procura_menor(vinicial, NumeroArquivos);
-      cout << "Menor ta no arquivo:" << ind << endl;
+     // cout << "Menor ta no arquivo:" << ind << endl;
       if(vinicial[ind].compare("&") == 0){
 		out[part] << " ~ ";
 	break;
@@ -221,7 +219,7 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
 int procura_menor(string vet[], int n){
   string menor;
   int i = 1, ind = 0;
-  cout << "-" << vet[0] << "-";
+  //cout << "-" << vet[0] << "-";
   if(vet[0].compare("&") != 0)
     menor = vet[0];
   else
@@ -231,7 +229,7 @@ int procura_menor(string vet[], int n){
       menor = vet[i];
       ind = i;
     }
-    cout << "-" << vet[i] << "-";
+    //cout << "-" << vet[i] << "-";
     i++;
   }
   return ind;
