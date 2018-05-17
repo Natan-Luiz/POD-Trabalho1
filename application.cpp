@@ -6,7 +6,6 @@
 //
 */
 
-
 #include<iostream>
 #include<fstream>
 #include<vector>
@@ -17,7 +16,7 @@
 #define NumeroArquivos 10 // 10 arquivos temp e 10 out.
 #define MemoriaRAM     200 // Tamanho da memoria disponivel para ordenação, em Bytes.
 
-#define ENTRADA "entrada.txt"
+#define ENTRADA "entrada.txt"			// Entrada precisa estar no mesmo diretório deste programa 
 #define SAIDA "saida.txt"
 
 using namespace std;
