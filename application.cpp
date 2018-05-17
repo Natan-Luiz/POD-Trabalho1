@@ -16,7 +16,7 @@
 #define NumeroArquivos 10 // 10 arquivos temp e 10 out.
 #define MemoriaRAM     200 // Tamanho da memoria disponivel para ordenação, em Bytes.
 
-#define ENTRADA "entrada.txt"			// Entrada precisa estar no mesmo diretório deste programa 
+#define ENTRADA "entrada.txt"			// Entrada precisa estar no mesmo diretório deste programa
 #define SAIDA "saida.txt"
 
 using namespace std;
@@ -24,7 +24,7 @@ using namespace std;
 void grava(string vetor[], int nome_arq, int val);
 int quicksort(string *a, int inicio, int fim);
 int particiona(string *a, int inicio, int fim);
-void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos);
+void intercalacao(int mRounds, int caminho, int maxCaminhos);
 void deletaTemps();
 int procura_menor(string *vet, int n);
 void encerra(fstream final[]);
@@ -61,7 +61,7 @@ int main()
     j++;
     particoes++;
   }
-  // O numero maximo de caminhos é dado pelo numero de vezes que se pode dividir o numero
+  // O numero maximo de "caminhos"(que seria uma "ida" ou "volta" pelos arquivos) é dado pelo numero de vezes que se pode dividir o numero
   // de particoes pelo numero de arquivos.
   int maxCaminhos = 0, result = particoes;
   while(result > 1){
@@ -70,12 +70,13 @@ int main()
   }
   result = (int)(particoes/NumeroArquivos) + (particoes % NumeroArquivos > 0 ? 1 : 0);
   cout << "Ordenando...." <<endl;
-  interpolacao(MemoriaRAM, result, 1, maxCaminhos);
+  intercalacao(result, 1, maxCaminhos);
   //Comentar deletaTemps caso queira ver os arquivos
   deletaTemps();
   return 0;
 }
 
+//Funcao que grava os dados do arquivo de entrada nos arquivos temporarios pela primeira vez.
 void grava(string vetor[], int nome_arq, int val){
   fstream fw;           //variavel FILE contendo o endereco do buffer
   stringstream num;     //string contendo o numero do buffer temporário
@@ -97,6 +98,7 @@ void grava(string vetor[], int nome_arq, int val){
   fw.close();
 }
 
+//Funcao que salva os dados do arquivo temporario que contem os dados ordenados para a saida.txt
 void encerra(int valor){
   cout << "Salvando...." << endl;
   fstream fpout, fpin;
@@ -112,8 +114,8 @@ void encerra(int valor){
   fpout.close();
 }
 
-
-void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
+//Funcao que intercala os arquivos alternando entre "temps" e "outs"
+void intercalacao(int mRounds, int caminho, int maxCaminhos){
   //Arquivos de entrada e de saida
   fstream in[NumeroArquivos];
   fstream out[NumeroArquivos];
@@ -187,7 +189,7 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
   //Chama novamente a interpolacao para o proximo caminho
   if(caminho < maxCaminhos){
     int result = (int)(mRounds/NumeroArquivos) + (mRounds % NumeroArquivos > 0 ? 1 : 0);
-    interpolacao(tamParticao*NumeroArquivos, result, caminho+1, maxCaminhos);
+    intercalacao(result, caminho+1, maxCaminhos);
   }
   //Ou encerra e salva os dados no arquivos de saida.txt
   else{
@@ -198,6 +200,7 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
   }
 }
 
+//procura o menor valor dentre os passados por parametro
 int procura_menor(string vet[], int n){
   string menor;
   int i = 1, ind = 0;
