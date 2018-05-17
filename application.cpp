@@ -41,8 +41,6 @@ int main()
   int i = 0, j = 0, particoes = 0, memoria = 0;
   //enquanto houver dados faça:
   while(fp >> palavra){
-   // i++;
-
     if(MemoriaRAM - memoria < palavra.size()){                       //quando i = memoria ram, faz o quick e poe nos buffers temporários
       quicksort(v, 0, i-1);
       memoria = 0;
@@ -52,7 +50,6 @@ int main()
       j++;
       particoes++;
     }
-
     v[i]=palavra;
     memoria+=palavra.size();
     i++;
@@ -65,8 +62,6 @@ int main()
     j++;
     particoes++;
   }
-
-
   // O numero maximo de caminhos é dado pelo numero de vezes que se pode dividir o numero
   // de particoes pelo numero de arquivos.
   int maxCaminhos = 0, result = particoes;
@@ -77,13 +72,10 @@ int main()
   result = (int)(particoes/NumeroArquivos) + (particoes % NumeroArquivos > 0 ? 1 : 0);
   cout << "Ordenando...." <<endl;
   interpolacao(MemoriaRAM, result, 1, maxCaminhos);
-
   //Comentar deletaTemps caso queira ver os arquivos
   deletaTemps();
   return 0;
-  }
-
-
+}
 
 void grava(string vetor[], int nome_arq, int val){
   fstream fw;           //variavel FILE contendo o endereco do buffer
@@ -110,12 +102,10 @@ void encerra(int valor){
   cout << "Salvando...." << endl;
   fstream fpout, fpin;
   fpout.open(SAIDA, fstream::out);
-
   if(valor == 1)
     fpin.open("temp0.txt", fstream::in);
   else
     fpin.open("out0.txt", fstream::in);
-
   string temp;
   while(fpin >> temp)
     if(temp.compare("~")!=0)
@@ -138,12 +128,10 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
     string enderecoIn = "temp"+num.str();
     enderecoIn += ".txt";
     const char *nomeI = enderecoIn.c_str();
-
     //Da o nome outN.txt
     string enderecoOut = "out"+num.str();
     enderecoOut += ".txt";
     const char *nomeO = enderecoOut.c_str();
-
     //Atribui out.txt ou temp.txt para 'in' ou 'out' de acordo com a rodada atual, para intercalar entre os dois arquivos
     if(caminho % 2 == 0){
       in[i].open(nomeO, fstream::in);
@@ -156,15 +144,13 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
     //incrementa o indice
     i++;
   }
-
   int round = 1, part = 0;
   //Chama novamente a interpolacao para a 'proxima rodada'/'proximo caminho'
   while (round <= mRounds){
     string vinicial[NumeroArquivos];
     //coloca menor valor de cada Conjunto de numero arquivos no vetor 'vinicial'
     for(int c = 0; c < NumeroArquivos; c++){
-      if(in[c] >> vinicial[c])
-      {
+      if(in[c] >> vinicial[c]){
         if (vinicial[c].compare("~") == 0)
 	   vinicial[c] = "&";
       }
@@ -173,17 +159,14 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
       }
     }
     while(true){
-
       //funcao que retorna o indice de qual arquivo esta o ponteiro de menor valor
       int ind = procura_menor(vinicial, NumeroArquivos);
-     // cout << "Menor ta no arquivo:" << ind << endl;
       if(vinicial[ind].compare("&") == 0){
-		out[part] << " ~ ";
+	out[part] << " ~ ";
 	break;
       }
       // coloca no vetor de saida o menor valor dos n arquivos
       out[part] <<  " " << vinicial[ind];
-
       //coloca flag quando ja leu toda a partição de um arquivo, ou seja todos as entradas de algum arquivo ja estão escritos na saida
       if(in[ind].peek() == -1)
         vinicial[ind] = "&";
@@ -199,8 +182,8 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
   }
   //aqui fecha os arquivos abertos nessa função
   for(int k = 0; k < NumeroArquivos; k++){
-      in[k].close();
-      out[k].close();
+    in[k].close();
+    out[k].close();
   }
   //Chama novamente a interpolacao para o proximo caminho
   if(caminho < maxCaminhos){
@@ -219,7 +202,6 @@ void interpolacao(int tamParticao, int mRounds, int caminho, int maxCaminhos){
 int procura_menor(string vet[], int n){
   string menor;
   int i = 1, ind = 0;
-  //cout << "-" << vet[0] << "-";
   if(vet[0].compare("&") != 0)
     menor = vet[0];
   else
@@ -229,7 +211,6 @@ int procura_menor(string vet[], int n){
       menor = vet[i];
       ind = i;
     }
-    //cout << "-" << vet[i] << "-";
     i++;
   }
   return ind;
@@ -268,10 +249,8 @@ int particiona(string *a, int inicio, int fim){
   string pivo;
   pindex = inicio;
   pivo = a[fim];
-  for(i = inicio; i < fim; i++)
-  {
-    if(pivo.compare(a[i]) >= 0)
-    {
+  for(i = inicio; i < fim; i++){
+    if(pivo.compare(a[i]) >= 0){
       swap(a[pindex], a[i]);
       pindex++;
     }
